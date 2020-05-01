@@ -1,0 +1,120 @@
+#include<bits/stdc++.h>
+using namespace std;
+
+struct node{//node for tree
+    int data;
+    struct node* left;
+    struct node* right;
+};
+
+struct node* findMin(struct node* root){
+    while(root->left!= NULL){
+        root = root->left;
+    }
+    return root;
+}
+
+struct node* deleteNode(struct node* root,int data){
+    if(root == NULL) return root;
+    else if(data < root->data) root->left = deleteNode(root->left,data);
+    else if(data > root->data) root->right = deleteNode(root->right,data);
+    else{
+        if(root->left == NULL && root->right == NULL){
+            delete root;
+            root = NULL;
+            return root;
+        }
+        else if(root->left ==NULL){
+            struct node* temp = root;
+            root = root->right;
+            delete temp;
+            return root;
+        }
+        else if(root->right == NULL){
+            struct node* temp = root;
+            root = root->left;
+            delete temp;
+            return root;
+        }
+        else{
+            struct node* temp = findMin(root->right);
+            root->data = temp->data;
+            root->right = deleteNode(root->right,temp->data);
+            return root;
+        }
+    }
+}
+
+int getMin(struct node* root){ 
+    if(root == NULL){
+        cout<<"Error: Tree not found!!!";
+        return -1;
+    }
+    if(root->left == NULL) return root->data;
+    else getMin(root->left);
+}
+
+int height(struct node* root){
+    if(root == NULL) return -1;
+    int lh = height(root->left);
+    int rh = height(root->right);
+    return max(lh,rh)+1;
+}
+
+void OrderTraversal(struct node* root){//TC: O(n) and SC: O(n/2) or O(n)
+    if(root == NULL) return;
+    queue<struct node*> nodes;
+    nodes.push(root);
+    while(!nodes.empty()){
+        struct node* root1 = nodes.front();
+        if(root1->left != NULL) nodes.push(root1->left);
+        if(root1->right != NULL) nodes.push(root1->right);
+        cout<<root1->data<<" ";
+        nodes.pop();
+    }
+}
+
+struct node* create(int data){
+    struct node* temp = (struct node*)malloc(sizeof(struct node));
+    temp->data = data;
+    temp->left = temp->right = NULL;
+    return temp;
+}
+
+struct node* insert(int data,struct node* head){
+    if(head == NULL)
+        return create(data);
+    else if(head->data > data)
+        head->left = insert(data,head->left);
+    else 
+        head->right = insert(data,head->right);
+}
+
+void print(struct node* head){
+    if(head == NULL) return;
+    print(head->left);
+    cout<<head->data<<" ";
+    print(head->right);
+}
+
+int main(){
+    struct node* head = create(10);
+    insert(2,head);
+    head = insert(5,head);
+    head = insert(30,head);
+    head = insert(35,head);
+    head = insert(15,head);
+    head = insert(1,head);
+    head = insert(25,head);
+    //print(head);
+    //cout<<getMin(head);4
+    //cout<<height(head);
+    cout<<"Before deleting: ";
+    OrderTraversal(head);
+    cout<<endl;
+    deleteNode(head,30);
+    cout<<"After deleting: ";
+    OrderTraversal(head);
+    
+    return 0;
+}
